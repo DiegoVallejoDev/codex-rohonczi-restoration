@@ -26,8 +26,21 @@ Restored spread (folio 20) and a 1:1 detail crop:
 - [`results/Codex_Rohonczi_Restored_compact.pdf`](results/Codex_Rohonczi_Restored_compact.pdf) —
   227 pages, 150 DPI, JPEG q90, ~57 MB. Committed so the output is available without rerunning.
 - The lossless 300 DPI master (`Codex_Rohonczi_Restored.pdf`, ~400 MB) is **not** committed: it
-  exceeds GitHub's 100 MB per-file limit. Rerun `run_pipeline.py` to regenerate it byte-for-byte,
-  or track it with Git LFS if you want it versioned.
+  exceeds GitHub's 100 MB per-file limit. It is published as a **release asset** instead — see
+  [Releases](../../releases) — or rerun `run_pipeline.py` to regenerate it locally.
+
+### Publishing a release
+
+`.github/workflows/release.yml` rebuilds both PDFs from scratch on a runner and attaches them to a
+release. Trigger it by pushing a tag, or manually:
+
+```bash
+git tag v1.0.0 && git push origin v1.0.0   # tag push
+gh workflow run release.yml -f tag=v1.0.0  # or manual dispatch
+```
+
+Re-running against an existing tag re-uploads the assets with `--clobber`. Release notes come from
+`.github/release-notes.md`. It is the only workflow in the repository — there is no CI on push.
 
 ## Caveats you should read before using the output
 

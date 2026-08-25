@@ -1,0 +1,71 @@
+name: Build and publish facsimile PDFs
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Release tag to create or update (e.g. v1.0.0)"
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+concurrency:
+  group: facsimile-release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Acquire source scans
+        run: python pipeline/acquire.py --out data/raw
+
+      - name: Extract pages at native resolution
+        run: python pipeline/extract.py --raw data/raw --out data/pages
+
+      - name: Denoise, isolate and colorize
+        run: python pipeline/restore.py --workers "$(nproc)"
+
+      - name: Compile lossless 300 DPI master
+        run: |
+          python pipeline/compile_pdf.py \
+            --dpi 300 --colors 128 \
+            --out Codex_Rohonczi_Restored.pdf
+
+      - name: Compile compact distribution copy
+        run: |
+          python pipeline/compile_pdf.py \
+            --dpi 300 --jpeg-quality 90 --scale 0.5 \
+            --out Codex_Rohonczi_Restored_compact.pdf
+
+      - name: Report artefact sizes
+        run: ls -lh Codex_Rohonczi_Restored*.pdf
+
+      - name: Publish release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ inputs.tag || github.ref_name }}
+        run: |
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            gh release upload "$TAG" Codex_Rohonczi_Restored.pdf Codex_Rohonczi_Restored_compact.pdf --clobber
+          else
+            gh release create "$TAG" Codex_Rohonczi_Restored.pdf Codex_Rohonczi_Restored_compact.pdf \
+              --title "Codex Rohonczi facsimile $TAG" \
+              --notes-file .github/release-notes.md
+          fi
