@@ -13,13 +13,34 @@ Source record: <https://real-ms.mtak.hu/80/>
 | Runtime | ~5 min on 8 cores (download → PDF) |
 | Colour | synthetic (see caveats) |
 
-## Sample output
+## Before / after
 
-Restored spread (folio 20) and a 1:1 detail crop:
+Source scan (left) against the restored, colorized output (right). Both panels are shown at the
+same display size and field of view, so the difference is the processing, not the resample.
 
-![Restored spread](samples/spread_folio20.png)
+**Folio 20 spread**
 
-![1:1 detail](samples/detail_1to1.png)
+![Source scan versus restored spread](samples/comparison_spread.png)
+
+**Same spread, 1:1 crop of the restored page** — grain removed, stroke edges intact, parchment
+mottling and the gutter shadow preserved rather than flattened:
+
+![Source detail versus restored detail](samples/comparison_detail.png)
+
+**Front cover** — binding shots are detected and mapped onto a leather ramp instead of parchment,
+which also recovers tooling texture crushed into near-black in the source:
+
+![Source cover versus restored cover](samples/comparison_spread_cover.png)
+
+Full-size restored renders on their own: [spread](samples/spread_folio20.png),
+[1:1 detail](samples/detail_1to1.png).
+
+Regenerate any of these figures from the intermediate artefacts in `data/`:
+
+```bash
+python tools/make_comparison.py
+python tools/make_comparison.py --page Rohonci_Codex_K_114cs_0001.png --suffix _cover --spread-only
+```
 
 ## Results in this repository
 
