@@ -1,0 +1,5 @@
+data/
+__pycache__/
+.ruff_cache/
+/Codex_Rohonczi_Restored.pdf
+/Codex_Rohonczi_Restored_compact.pdf
