@@ -133,4 +133,8 @@ Python 3.11+ and the pinned dependencies in `requirements.txt` (`requests`, `bea
 The Rohonc Codex itself is a 16th-century manuscript in the public domain. The source scans are
 published by the Library and Information Centre of the Hungarian Academy of Sciences (MTA KIK /
 MTAK) in the REAL-MS repository; the derived images here remain subject to whatever terms MTAK
-applies to that record. Please cite the repository record when reusing the output.
+applies to that record. Please cite the source record when reusing the output:
+
+> Németh, L. (2015). *Rohonc Codex (K 114)* [Manuscript]. Library and Information Centre of the
+> Hungarian Academy of Sciences (MTA KIK), REAL-MS repository. Retrieved August 24, 2026, from
+> <https://real-ms.mtak.hu/80/>.
