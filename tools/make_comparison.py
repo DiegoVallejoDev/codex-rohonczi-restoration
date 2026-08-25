@@ -50,6 +50,11 @@ def side_by_side(left: Image.Image, right: Image.Image, labels: tuple[str, str])
     return canvas
 
 
+def report(path: pathlib.Path) -> None:
+    name = path.relative_to(ROOT) if path.is_relative_to(ROOT) else path
+    print(f"{name} {path.stat().st_size / 1e6:.1f} MB")
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--page", default="Rohonci_Codex_K_114cs_0020.png")
@@ -60,6 +65,11 @@ def main() -> int:
     parser.add_argument("--crop", type=int, nargs=4, default=(1180, 300, 1900, 780), help="restored-space crop box")
     parser.add_argument("--suffix", default="", help="appended to the output filenames")
     parser.add_argument("--spread-only", action="store_true")
+    parser.add_argument(
+        "--labels",
+        nargs=2,
+        default=("Source scan (public ~100 DPI monochrome)", "Restored + synthetically colorized"),
+    )
     args = parser.parse_args()
 
     source = Image.open(args.pages / args.page)
@@ -73,12 +83,12 @@ def main() -> int:
     spread = side_by_side(
         source.resize(panel, Image.LANCZOS),
         restored.resize(panel, Image.LANCZOS),
-        ("Source scan (public ~100 DPI monochrome)", "Restored + synthetically colorized"),
+        tuple(args.labels),
     )
     spread_path = args.out / f"comparison_spread{args.suffix}.png"
     spread.save(spread_path, optimize=True)
     if args.spread_only:
-        print(f"{spread_path.relative_to(ROOT)} {spread_path.stat().st_size / 1e6:.1f} MB")
+        report(spread_path)
         return 0
 
     # Detail: crop the restored page, and the matching region of the source scaled 1:1 to it.
@@ -94,7 +104,7 @@ def main() -> int:
     detail.save(detail_path, optimize=True)
 
     for path in (spread_path, detail_path):
-        print(f"{path.relative_to(ROOT)} {path.stat().st_size / 1e6:.1f} MB")
+        report(path)
     return 0
 
 
